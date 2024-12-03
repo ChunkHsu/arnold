@@ -16,7 +16,7 @@ Vagrant.configure("2") do |config|
       '-v', '/usr/share/vulkan/implicit_layer.d/nvidia_layers.json:/etc/vulkan/implicit_layer.d/nvidia_layers.json', 
       '-v', '/usr/share/glvnd/egl_vendor.d/10_nvidia.json:/usr/share/glvnd/egl_vendor.d/10_nvidia.json', 
       # 挂在数据集合
-      '-v', '/home/chunk/arnold:/root/arnold/',
+      '-v', '/home/chunk/CodeSpace/arnold:/root/arnold/',
       
     ]
     d.image = "arnold"

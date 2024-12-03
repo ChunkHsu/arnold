@@ -3,7 +3,9 @@
 *.zip
 output/
 arnold_tmp.code-workspace
-workspace/
+workspace/**
+**/Vagrantfile
+**/Dockerfile
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -11,7 +13,7 @@ __pycache__/
 *$py.class
 
 # C extensions
-*.so
+*.soW
 
 # Distribution / packaging
 .Python
