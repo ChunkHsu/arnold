@@ -10,3 +10,4 @@
     └── Vagrantfile
   ```
 - 项目的配置文件很重要： `./configs/default.yaml` 里面保护运行的环境、模型及任务等参数的指定路径
+

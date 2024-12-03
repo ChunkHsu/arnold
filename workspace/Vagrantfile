@@ -5,16 +5,23 @@ Vagrant.configure("2") do |config|
   config.ssh.username = "root"
   config.ssh.password = "root"
   config.vm.provider :docker do |d|
-    d.create_args = ['--sysctl', 'net.ipv4.ip_default_ttl=66', '--sysctl', 'net.ipv6.conf.all.hop_limit=66', 
-    '-v', '/var/lib/docker', '--shm-size', '2gb', 
-    '-v', '/tmp/.X11-unix:/tmp/.X11-unix', '--gpus', 'all', '-e', '"ACCEPT_EULA=Y"', 
-    '-v', '/etc/vulkan/icd.d/nvidia_icd.json:/etc/vulkan/icd.d/nvidia_icd.json', 
-    '-v', '/etc/vulkan/implicit_layer.d/nvidia_layers.json:/etc/vulkan/implicit_layer.d/nvidia_layers.json', 
-    '-v', '/usr/share/glvnd/egl_vendor.d/10_nvidia.json:/usr/share/glvnd/egl_vendor.d/10_nvidia.json', 
+    d.create_args = [
+      '--sysctl', 'net.ipv4.ip_default_ttl=66', '--sysctl', 'net.ipv6.conf.all.hop_limit=66', 
+      '-v', '/home/chunk/var/lib/docker', 
+      '--shm-size', '2gb', 
+      '-v', '/tmp/.X11-unix:/tmp/.X11-unix', '--gpus', 'all', '-e', '"ACCEPT_EULA=Y"', 
+      # '-v', '/etc/vulkan/icd.d/nvidia_icd.json:/etc/vulkan/icd.d/nvidia_icd.json', 
+      '-v', '/usr/share/vulkan/icd.d/nvidia_icd.json:/etc/vulkan/icd.d/nvidia_icd.json', 
+      # '-v', '/etc/vulkan/implicit_layer.d/nvidia_layers.json:/etc/vulkan/implicit_layer.d/nvidia_layers.json', 
+      '-v', '/usr/share/vulkan/implicit_layer.d/nvidia_layers.json:/etc/vulkan/implicit_layer.d/nvidia_layers.json', 
+      '-v', '/usr/share/glvnd/egl_vendor.d/10_nvidia.json:/usr/share/glvnd/egl_vendor.d/10_nvidia.json', 
+      # 挂在数据集合
+      '-v', '/home/chunk/arnold:/root/arnold/',
+      
     ]
-     d.image = "arnold"
-     d.remains_running = true
-     d.has_ssh = true
+    d.image = "arnold"
+    d.remains_running = true
+    d.has_ssh = true
   end
 
 
@@ -22,6 +29,9 @@ config.vm.provision "shell", inline: <<-SHELL
 echo "export DISPLAY=#{ENV['DISPLAY']}" >> /root/.profile
 # xfce4-power-manager -q
 SHELL
+
+# 设置 rdp port
+config.vm.network "forwarded_port", guest: 3389, host: 3389
 
 #   config.vm.provision :shell, path: "install.sh", privileged: false
 config.vm.provision :shell, inline: "service xrdp restart", run: 'always'
