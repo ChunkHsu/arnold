@@ -2,11 +2,14 @@
 For example, run:
     Single-task:
         python eval.py task=pickup_object model=peract lang_encoder=clip \
-                       mode=eval use_gt=[0,0] visualize=0
+                    mode=eval use_gt=[0,0] visualize=0
+    单个任务的运行: e.g. /isaac-sim/python.sh  eval.py task=pour_water model=eval use_gt=[1,1] visualize=1
+    
     Multi-task:
         python eval.py task=multi model=peract lang_encoder=clip \
-                       mode=eval use_gt=[0,0] visualize=0
+                    mode=eval use_gt=[0,0] visualize=0
 """
+
 import hydra
 import json
 import logging
@@ -39,9 +42,9 @@ def load_data(data_path):
 
 
 def load_agent(cfg, device):
-    if cfg.checkpoint_file:
+    if cfg.checkpoint_file:  # 加载模型检查点
         checkpoint_path = cfg.checkpoint_file
-    else:
+    else:  
         for fname in os.listdir(cfg.checkpoint_dir):
             if fname.endswith('best.pth'):
                 checkpoint_path = os.path.join(cfg.checkpoint_dir, fname)
@@ -79,8 +82,10 @@ def load_agent(cfg, device):
     return agent, lang_embed_cache
 
 
+# 加载 configs/default.yaml 中的配置
 @hydra.main(config_path='./configs', config_name='default')
 def main(cfg):
+    # 用于保存模型检查点
     cfg.checkpoint_dir = cfg.checkpoint_dir.split(os.path.sep)
     cfg.checkpoint_dir[-2] = cfg.checkpoint_dir[-2].replace('eval', 'train')
     cfg.checkpoint_dir = os.path.sep.join(cfg.checkpoint_dir)
@@ -90,11 +95,12 @@ def main(cfg):
 
     offset = cfg.offset_bound
     use_gt = cfg.use_gt
-    if not (use_gt[0] and use_gt[1]):
+    if not (use_gt[0] and use_gt[1]):  # 00 01 10 时加载
         agent, lang_embed_cache = load_agent(cfg, device=device)
 
+    # 任务列表，先检查配置中的task
     if cfg.task != 'multi':
-        task_list = [cfg.task]
+        task_list = [cfg.task]  # 指定单个任务
     else:
         task_list = [
             'pickup_object', 'reorient_object', 'open_drawer', 'close_drawer',
@@ -108,9 +114,11 @@ def main(cfg):
             eval_setting = '1gt'
     else:
         eval_setting = '0gt'
+
     log_path = os.path.join(cfg.exp_dir, f'eval_{eval_setting}_log.json')
 
     """
+    验证集的日志结构
     eval log structure:
     {
         'task_name': {
@@ -123,7 +131,7 @@ def main(cfg):
         }
     }
     """
-
+    
     if os.path.exists(log_path):
         with open(log_path, 'r') as f:
             eval_log = json.load(f)
@@ -131,14 +139,15 @@ def main(cfg):
         eval_log = {}
 
     for task in task_list:
-        if task not in eval_log:
+        if task not in eval_log:  # 任务不存在验证日志
             eval_log[task] = {}
         for eval_split in cfg.eval_splits:
-            if eval_split not in eval_log[task]:
+            if eval_split not in eval_log[task]:  # 划分的验证日志不存在
                 eval_log[task][eval_split] = {}
             elif 'score' in eval_log[task][eval_split]:
                 continue
             
+            # 加载验证集数据
             if os.path.exists(os.path.join(cfg.data_root, task, eval_split)):
                 logger.info(f'Evaluating {task} {eval_split}')
                 data, fnames = load_data(data_path=os.path.join(cfg.data_root, task, eval_split))
