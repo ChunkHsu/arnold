@@ -3,7 +3,7 @@
 - 关于原任务数据的使用：下载的数据可以放在`./workspace`下面
   ```sh
   workspace/
-    ├── data/
+    ├── tasks/
     ├── Dockerfile
     ├── materials/
     ├── sample/
