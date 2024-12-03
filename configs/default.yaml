@@ -12,9 +12,11 @@ data_root: ${workspace_root}/data
 asset_root: ${workspace_root}
 # 输出目录
 output_root: ${base_root}/output
-
+# 模式
 mode: train   # train or eval
+# 运行的任务
 task: null
+
 model: null
 obs_type: rgb
 lang_encoder: clip

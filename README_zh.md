@@ -35,6 +35,7 @@
 4. 装双系统，先装了`ubuntu20.04`，但运行的时候与`cpu`有兼容性问题，屏幕显示扭曲、有雪花
 5. 装`ubuntu22.04`，在系统中安装了`docker engine、 nvidia docker`、`vagrant`以及必备的软件，同时下载了`omniverse、Isaac Sim`，在宿主机上能够打开对应的`Isaac Sim`，尝试在`win10`中也装了`omniverse、Isaac Sim`但是不能用。于是就在`ubuntu22.04`中使用
 6. 在`ubuntu22.04`使用`omniverse的Isaac Sim`构建了`WebUI`的页面，同时也测试了使用内网穿透来访问`Isaac Sim WebUI`服务，可以正常访问，至此、系统的一个重要的模块完成
+   - http://127.0.0.1:8211/streaming/webrtc-client?server=127.0.0.1
 7. 使用源码在`ubuntu22.04`中使用`Isaac Sim`的`python`运行，但是报错`导入模块错误`，但是源码中使用的是项目根目录下的`util`包，正常是不会报错...于是尝试在虚拟机中运行
 8. 在`ubuntu22.04`中，使用`dockerfile`构建了`arnold`镜像，在`vagrant`使用此`arnold`镜像构建了虚拟机，在虚拟机中:
    - 部分官方样例可以运行
@@ -50,3 +51,4 @@
     2024-12-03 16:28:27 [322,866ms] [Error] [carb.scenerenderer-rtx.plugin] Failed to execute RenderGraph on device 0. Error Code: 7 
 
   ```
+  运行视频 `/home/chunk/Videos/录屏`
