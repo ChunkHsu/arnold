@@ -30,14 +30,21 @@ logger = logging.getLogger(__name__)
 
 
 def load_data(data_path):
+    """从任务路径加载数据
+    Args:
+        data_path (str): 八个任务之一的路径
+
+    Returns:
+        tuple(list, list): data 加载的 npz 数据,  fnames 加载的任务数据文件名
+    """
     demos = list(Path(data_path).iterdir())
     demo_path = sorted([str(item) for item in demos if not item.is_dir()])
     data = []
     fnames = []
 
     for npz_path in demo_path:
-        data.append(np.load(npz_path, allow_pickle=True))
-        fnames.append(npz_path)
+        data.append(np.load(npz_path, allow_pickle=True))  # npz 数据中有 keys：‘gt’ ‘info’
+        fnames.append(npz_path)  # 加载的任务数据文件名
     return data, fnames
 
 
@@ -147,20 +154,20 @@ def main(cfg):
             elif 'score' in eval_log[task][eval_split]:
                 continue
             
-            # 加载验证集数据
+            # 加载数据集
             if os.path.exists(os.path.join(cfg.data_root, task, eval_split)):
                 logger.info(f'Evaluating {task} {eval_split}')
                 data, fnames = load_data(data_path=os.path.join(cfg.data_root, task, eval_split))
             else:
-                logger.info(f'{eval_split} not exist')
+                logger.info(f'Error: {eval_split} not exist')
                 continue
 
             correct = 0
             total = 0
             stats = {}
             while len(data) > 0:
-                anno = data.pop(0)
-                fname = fnames.pop(0)
+                anno = data.pop(0)  # 加载第一个任务数据
+                fname = fnames.pop(0)  # 加载第一个任务数据文件名
                 gt_frames = anno['gt']
                 robot_base = gt_frames[0]['robot_base']
 
