@@ -37,17 +37,31 @@ def cup_shape_predicate(prim_path: str):
 
 
 def load_task(asset_root, npz, cfg):
+    """加载任务相关的参数和配置
+
+    Args:
+        asset_root (str): 资源文件的根目录路径
+        npz (npzfile): np.load() 加载的一条npz数据 {'gt': {}, 'info': {}}
+        cfg (_type_): 配置对象，包含任务配置
+
+    Raises:
+        Exception: 报错
+
+    Returns:
+        tuple(): env(class): task_type对应的任务的环境对象, objects_parameters[0]: list物体参数, robot_parameters 机器人参数, scene_parameters 和场景参数的元组
+    """
     import os
     from tasks.checkers import BaseChecker, PickupChecker, OrientChecker, JointChecker, WaterChecker
-    info = npz['info'].item()
+    info = npz['info'].item() # 从npz文件中提取任务信息
 
-    scene_parameters = [SceneParameters(**info['scene_parameters'])]
-    scene_parameters[0].usd_path = os.path.abspath(scene_parameters[0].usd_path).split(os.path.sep)
-    path_idx = scene_parameters[0].usd_path.index('VRKitchen2.0')
+    scene_parameters = [SceneParameters(**info['scene_parameters'])] # 初始化场景参数
+    scene_parameters[0].usd_path = os.path.abspath(scene_parameters[0].usd_path).split(os.path.sep) # 处理场景USD路径
+    path_idx = scene_parameters[0].usd_path.index('VRKitchen2.0') 
     path_idx += 1
     scene_parameters[0].usd_path = os.path.join(asset_root, os.path.sep.join(scene_parameters[0].usd_path[path_idx:]))
-
-    floor_material_url = scene_parameters[0].floor_material_url
+    
+    # 处理地板材质路径
+    floor_material_url = scene_parameters[0].floor_material_url 
     if 'omniverse' in floor_material_url:
         floor_material_url = floor_material_url.split(os.path.sep)
         
@@ -73,7 +87,8 @@ def load_task(asset_root, npz, cfg):
         scene_parameters[0].floor_material_url = os.path.join(
             asset_root, os.path.sep.join(floor_material_url[path_idx:])
         )
-
+        
+    # 处理墙壁材质路径
     wall_material_url = scene_parameters[0].wall_material_url
     if 'omniverse' in wall_material_url:
         wall_material_url = wall_material_url.split(os.path.sep)
@@ -100,14 +115,17 @@ def load_task(asset_root, npz, cfg):
             asset_root, os.path.sep.join(wall_material_url[path_idx:])
         )
 
+    # 初始化机器人参数
     robot_parameters = [RobotParameters(**info['robot_parameters'])]
+    # 处理机器人USD路径
     robot_parameters[0].usd_path = os.path.abspath(robot_parameters[0].usd_path).split(os.path.sep)
     path_idx = robot_parameters[0].usd_path.index('VRKitchen2.0')
     path_idx += 1
     robot_parameters[0].usd_path = os.path.join(
         asset_root, os.path.sep.join(robot_parameters[0].usd_path[path_idx:])
     )
-
+    
+    # 初始化物体参数
     objects_parameters = [[]]
     for i in range(len(info['objects_parameters'])):
         object_parameters = {
@@ -187,6 +205,7 @@ def load_task(asset_root, npz, cfg):
     light_usd_path = os.path.join(cfg.asset_root, 'sample/light/skylight.usd')
     stage_properties = StageProperties(light_usd_path, "y", 0.01, gravity_direction=[0,-1,0], gravity_magnitude=981)
 
+    # 根据任务类型初始化环境
     task_name = object_parameters['args']['task_type']
 
     if object_parameters['args']['task_type'] == 'pickup_object':

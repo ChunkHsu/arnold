@@ -17,6 +17,167 @@
 
 - 运行任务时需要先编译`./utils/compute_points.pyx` , 进入到 utils目录，`/isaac-sim/python.sh setup.py build_ext --inplace` 
 
+## npz数据包含的属性
+```json
+"gt":[
+  {
+    "images": [ // 一个图像帧
+      {
+        "rgb": [[[0],[1]...[127]],],
+        "depthLinear": [[],[],],  // 包含深度图像数据
+        "camera": { // 包含相机相关的信息
+          "pose": [[],[],], // 相机的位置和方向
+          "fov": 1.3959954678, // 相机的视场角
+          "focal_length": 12.4899959564, // 相机的焦距
+          "horizontal_aperture":20.9549999237, // 相机的水平光圈大小
+          "view_projection_matrix":[[,,,],[],], // 视图投影矩阵，用于将3D坐标转换为2D图像坐标
+          "resolution":{ // 相机图像的分辨率
+            "width": 128,
+            "height": 128
+          },
+          "clipping_range": { // 定义了渲染时的裁剪范围
+            "dimension": 2
+          }
+        },
+        "semanticSegmentation": [[],],
+        "state": {
+          "rgb": true,
+          "depthLinear": true,
+          "semanticSegmentation": true
+        }
+      },...
+    ],
+    "semantic_id": {}, // 可能包含语义分割的标识符或标签
+    "keyframe": false, // 指示当前帧是否是关键帧
+    "instruction": "empty all water out of the cup", // 提供了机械臂执行任务的指令，例如“清空杯子里的所有水”
+    "template_actions": null, // 可能包含预定义的动作模板
+    "diff": 100.0, // 表示某种差异度量，可能是目标状态和当前状态之间的差异
+    "robot_base": [[19.87,0.00,304.88],[-0.70,0.70,-0.00,0.00]], // 包含机械臂基座的位置和方向
+    "position_rotation_world":[[65.95,38.83,304.32],[-0.25,0.29,-0.64,0.65]], // 包含机械臂末端执行器在世界坐标系中的位置和旋转
+    "gripper_joint_positions":[4.0,3.99], // 包含夹持器关节的位置
+    "joint_positions":[0.012,-0.57,-4.22,-2.80,0.0,3.09,0.74,4.0,3.99], // 包含机械臂所有关节的位置
+    "joint_velocities":[0.0,2.90,0.0,-7.20,-0.0,-8.40,-0.0,-0.0,0.00], // 包含机械臂关节的速度
+    "gripper_open":true, // 指示夹持器是否打开
+    "target":[0,0] // 可能包含任务的目标位置或状态
+  },...
+]
+'info':{
+    "scene_parameters": {
+        "usd_path": "/root/VRKitchen2.0/sample/house/0/layout.usd",
+        "task_type": "pour_water",
+        "traj_dir": "/root/VRKitchen2.0/translate/AWS/pour_water-0-0-2-0-0-0/trajectory",
+        "floor_path": "floors",
+        "wall_path": "roomStruct",
+        "furniture_path": "furniture",
+        "floor_material_url": "/root/VRKitchen2.0/materials/Wood/Ash.mdl",
+        "wall_material_url": "/root/VRKitchen2.0/materials/Wall_Board/Cardboard.mdl"
+    },
+    "robot_parameters": {
+        "usd_path": "/root/VRKitchen2.0/sample/robot/franka/franka.usd",
+        "robot_position": [,,],
+        "robot_orientation_quat": [,,,]
+    },
+    "objects_parameters": [
+        {
+            "usd_path": "/root/VRKitchen2.0/sample/custom/Cup/0/cup.usd",
+            "scale": array([,,]),
+            "object_position": [,,],
+            "orientation_quat": [,,,],
+            "object_type": "Cup",
+            "args": {
+                "annotator": "AWS",
+                "task_type": "pour_water",
+                "task_id": "0",
+                "house_id": "0",
+                "mission_id": "2",
+                "robot_id": "0",
+                "robot": {
+                    "type": "franka",
+                    "translate": [,,],
+                    "orient": [,,,]
+                },
+                "objects": [
+                    {
+                        "asset_path": "./custom/Cup/0/cup.usd",
+                        "obj_type": "Cup",
+                        "obj_id": "0",
+                        "materials": [],
+                        "has_water": True,
+                        "translate": [,,],
+                        "orient": [,,,],
+                        "scale": [,,]
+                    }
+                ],
+                "state": (0, 0)
+            },
+            "object_physics_properties": {
+                "collision": "convexDecomposition",
+                "is_rigid_body": True
+            },
+            "part_physics_properties": {
+                "cup_shape": {
+                    "mass": 0.01,
+                    "static_friction": 1.0,
+                    "dynamic_friction": 1.0,
+                    "restitution": 0.0,
+                    "has_physics_material": True,
+                    "collision": "convexDecomposition",
+                    "is_rigid_body": False
+                }
+            },
+            "fluid_properties": {
+                "fluid_sphere_diameter": 0.72,
+                "particle_system_schema_parameters": {
+                    "contact_offset": 0.8999999999999999,
+                    "particle_contact_offset": 0.75,
+                    "rest_offset": 0.75,
+                    "solid_rest_offset": 0,
+                    "fluid_rest_offset": 0.44999999999999996,
+                    "solver_position_iterations": 10,
+                    "wind": Gf.Vec3f(0.0, 0.0, 0.0),
+                    "max_velocity": 40
+                },
+                "particle_mass": 3e-07,
+                "particle_color": array([,,])
+            },
+            "object_timeline_management": {
+                "init_state": 0,
+                "target_state": 0,
+                "language_description": None,
+                "target_joint": None
+            }
+        }
+    ],
+    "config": {
+        "annotator": "AWS",
+        "task_type": "pour_water",
+        "task_id": "0",
+        "house_id": "0",
+        "mission_id": "2",
+        "robot_id": "0",
+        "robot": {
+            "type": "franka",
+            "translate": [,,],
+            "orient": [,,,]
+        },
+        "objects": [
+            {
+                "asset_path": "./custom/Cup/0/cup.usd",
+                "obj_type": "Cup",
+                "obj_id": "0",
+                "materials": [],
+                "has_water": True,
+                "translate": [,,],
+                "orient": [,,,],
+                "scale": [,,]
+            }
+        ],
+        "state": (0, 0)
+    },
+    "robot_shift": [,,]
+}
+```
+
 ## 环境的配置
 
 - 使用 wget 下载 Vagrant 软件包：

@@ -166,32 +166,38 @@ def main(cfg):
             total = 0
             stats = {}
             while len(data) > 0:
-                anno = data.pop(0)  # 加载第一个任务数据
-                fname = fnames.pop(0)  # 加载第一个任务数据文件名
-                gt_frames = anno['gt']
-                robot_base = gt_frames[0]['robot_base']
-
-                gt_actions = [gt_frames[1]['position_rotation_world'], gt_frames[2]['position_rotation_world']]
-                if gt_frames[3]['position_rotation_world'] is not None:
-                    gt_actions.append(
+                anno = data.pop(0)  # 加载列首任务数据
+                fname = fnames.pop(0)  # 加载列首任务数据文件名
+                gt_frames = anno['gt']  # 加载列首任务数据中的 gt 键值
+                robot_base = gt_frames[0]['robot_base']  # 包含机械臂基座的位置和方向 "robot_base":[[19.87,0.00,304.88],[-0.70,0.70,-0.00,0.00]],
+                gt_actions = [gt_frames[1]['position_rotation_world'], gt_frames[2]['position_rotation_world']] # 下两帧的机械臂末端执行器在世界坐标系中的位置和旋转
+                if gt_frames[3]['position_rotation_world'] is not None: # 如果有第三个动作
+                    gt_actions.append( # 加入第三个动作
+                        # 如果不是倒水任务
                         gt_frames[3]['position_rotation_world'] if 'water' not in task \
-                        else (gt_frames[3]['position_rotation_world'][0], gt_frames[4]['position_rotation_world'][1])
+                        else (gt_frames[3]['position_rotation_world'][0], gt_frames[4]['position_rotation_world'][1]) # 如果是倒水任务
                     )
                 else:
                     gt_actions.append(None)
 
                 if use_gt[0]:
+                    # 前两帧动作缺失时报错
                     assert gt_actions[0] is not None and gt_actions[1] is not None, "Use first gt action but it is missing"
                 if use_gt[1]:
+                    # 第三帧动作缺失时报错
                     assert gt_actions[2] is not None, "Use second gt action but it is missing"
 
+                # 加载任务相关的参数和配置
                 env, object_parameters, robot_parameters, scene_parameters = load_task(cfg.asset_root, npz=anno, cfg=cfg)
-
+                # 重置环境
                 obs = env.reset(robot_parameters, scene_parameters, object_parameters, 
                                 robot_base=robot_base, gt_actions=gt_actions)
 
+                # 打印日志
                 logger.info(f'Instruction: {gt_frames[0]["instruction"]}')
                 logger.info('Ground truth action:')
+                
+                # 处理机械臂动作，并将每个动作的位置、旋转和夹持器状态记录到日志中
                 for gt_action, grip_open in zip(gt_actions, cfg.gripper_open[task]):
                     if gt_action is None:
                         continue
@@ -199,6 +205,7 @@ def main(cfg):
                     act_rot = R.from_quat(act_rot[[1,2,3,0]]).as_euler('XYZ', degrees=True)
                     logger.info(f'trans={act_pos}, orient(euler XYZ)={act_rot}, gripper_open={grip_open}')
 
+                # 记录
                 if cfg.record:
                     env.recorder.start_record(
                         traj_dir=os.path.join(cfg.exp_dir, f'traj_{eval_setting}', os.path.split(fname)[-1]),

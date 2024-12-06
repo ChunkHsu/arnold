@@ -1,6 +1,7 @@
 *.npz
 /data
 *.zip
+*.ipynb
 output/
 arnold_tmp.code-workspace
 workspace/**
